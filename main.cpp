@@ -3,4 +3,5 @@ using namespace std;
 int main()
 {
     cout << "This is a git repository" << endl;
+    return 0;
 }
