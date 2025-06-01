@@ -4,4 +4,5 @@ int main()
 {
     cout << "Welcome, Serious AF Boyz!" << endl;
     cout << "Hello World!" << endl;
+    cout << "New commited message after the meeting" << endl;
 }
