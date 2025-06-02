@@ -1,4 +1,7 @@
 #include<SFML/Graphics.hpp>
+#include"elements/ball.h"
+#include"elements/paddle.h"
+#include"elements/brick.h"
 using namespace sf;
 #define screenWidth 1280
 #define screenHeight 720
@@ -9,6 +12,10 @@ int main()
     RectangleShape square(Vector2f{100.0f,100.0f});
     square.setPosition(Vector2f{590.0f,310.0f});
     square.setFillColor(Color::Red);
+
+    Ball newBall;
+    Paddle newPaddle;
+    Brick newBrick;
 
     while(window.isOpen())
     {
