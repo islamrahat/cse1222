@@ -9,8 +9,8 @@ using namespace sf;
 int main()
 {
     RenderWindow window(VideoMode(screenWidth,screenHeight),"New Window", Style::Default);
-    RectangleShape square(Vector2f{100.0f,100.0f});
-    square.setPosition(Vector2f{590.0f,310.0f});
+    RectangleShape square(Vector2f{200.0f,20.0f});
+    square.setPosition(Vector2f{520.0f,680.0f});
     square.setFillColor(Color::Red);
 
     Ball newBall;
@@ -24,10 +24,8 @@ int main()
         {
             if(ev.type==ev.Closed) window.close();
         }
-        if(Keyboard::isKeyPressed(Keyboard::A)) square.move(Vector2f{-0.10f,0.0f});
-        if(Keyboard::isKeyPressed(Keyboard::D)) square.move(Vector2f{0.10f,0.0f});
-        if(Keyboard::isKeyPressed(Keyboard::W)) square.move(Vector2f{0.0f,-0.10f});
-        if(Keyboard::isKeyPressed(Keyboard::S)) square.move(Vector2f{0.0f,0.10f});
+        if(Keyboard::isKeyPressed(Keyboard::A)) square.move(Vector2f{-0.20f,0.0f});
+        if(Keyboard::isKeyPressed(Keyboard::D)) square.move(Vector2f{0.20f,0.0f});
         window.clear();
         window.draw(square);
         window.display();
