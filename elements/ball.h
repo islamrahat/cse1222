@@ -2,14 +2,16 @@
 #include<SFML/Graphics.hpp>
 using namespace std;
 using namespace sf;
+#define screenWidth 1280
+#define screenHeight 720
 
 class BallClass{
 public:
-    CircleShape bal;
-    BallClass() : bal(10.0f)
+    CircleShape ball;
+    BallClass() : ball(10.0f)
     {
         cout << "Ball Created" << endl;
-        bal.setPosition(20.f,20.0f);
-        bal.setFillColor(Color::Green);
+        ball.setPosition(screenWidth/2,660.0f);
+        ball.setFillColor(Color::Green);
     } 
 };
