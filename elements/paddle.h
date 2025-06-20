@@ -1,7 +1,7 @@
 #include<iostream>
 using namespace std;
 
-class Paddle{
+class PaddleClass{
 public:
-    Paddle() {cout << "Paddle Created" << endl;}
+    PaddleClass() {cout << "Paddle Created" << endl;}
 };

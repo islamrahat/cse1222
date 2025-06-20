@@ -1,7 +1,7 @@
 #include<iostream>
 using namespace std;
 
-class Brick{
+class BrickClass{
 public:
-    Brick() {cout << "Brick Created" << endl;}
+    BrickClass() {cout << "Brick Created" << endl;}
 };
