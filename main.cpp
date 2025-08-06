@@ -1,80 +1,378 @@
 #include<SFML/Graphics.hpp>
-#include<bits/stdc++.h>
-#include"elements/ball.h"
-#include"elements/paddle.h"
-#include"elements/brick.h"
+#include<SFML/Audio.hpp>
+#include<iostream>
+#include<thread>
 using namespace sf;
-#define screenWidth 1280
-#define screenHeight 720
+using namespace std;
 
-int main()
+class Paddle {
+public:
+    Sprite sprite;
+
+    Paddle(Texture& texture) {
+        sprite.setTexture(texture);
+    }
+
+    void setPosition(float x, float y) {
+        sprite.setPosition(x, y);
+    }
+
+    void move(float offsetX, float offsetY) {
+        sprite.move((0.5*offsetX), (0.5*offsetY));
+    }
+};
+
+class Ball {
+public:
+    CircleShape shape;
+
+    Ball(float radius) {
+        shape.setRadius(radius);
+        shape.setFillColor(Color::Red);
+    }
+
+    void setPosition(float x, float y) {
+        shape.setPosition(x, y);
+    }
+
+    void move(float offsetX, float offsetY) {
+        shape.move((0.5*offsetX), (0.5*offsetY));
+    }
+};
+
+class Brick {
+public:
+    Sprite sprite;
+
+    Brick(Texture& texture) {
+        sprite.setTexture(texture);
+    }
+
+    void setPosition(float x, float y) {
+        sprite.setPosition(x, y);
+    }
+};
+
+class Menu {
+public:
+    Text startText;
+    Text aboutUsText;
+    Text quitText;
+
+    Menu(Font& font) {
+        startText.setFont(font);
+        startText.setCharacterSize(40);
+        startText.setFillColor(Color::White);
+        startText.setString("Start Game");
+        startText.setPosition(860, 300);
+
+        aboutUsText.setFont(font);
+        aboutUsText.setCharacterSize(40);
+        aboutUsText.setFillColor(Color::White);
+        aboutUsText.setString("About Us");
+        aboutUsText.setPosition(860, 400);
+
+        quitText.setFont(font);
+        quitText.setCharacterSize(40);
+        quitText.setFillColor(Color::White);
+        quitText.setString("Quit Game");
+        quitText.setPosition(860, 500);
+    }
+
+    void draw(RenderWindow& window)
 {
-    RenderWindow window(VideoMode(screenWidth,screenHeight),"New Window", Style::Default);
-    RectangleShape paddle(Vector2f{200.0f,20.0f});
-    paddle.setPosition(Vector2f{520.0f,680.0f});
-    paddle.setFillColor(Color::Red);
+        window.draw(startText);
+        window.draw(aboutUsText);
+        window.draw(quitText);
+    }
 
-    BallClass newBall;
-    PaddleClass newPaddle;
-    BrickClass newBrick;
+    int handleInput(RenderWindow& window)
+    {
+        Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == Event::Closed) {
+                window.close();
+            } else if (event.type == Event::MouseButtonPressed) {
+                Vector2f mousePosition = window.mapPixelToCoords(Mouse::getPosition(window));
 
-    Clock clock;
-    int direction = -1;
+                if (startText.getGlobalBounds().contains(mousePosition)) {
+                    return 1; // Start Game
+                } else if (aboutUsText.getGlobalBounds().contains(mousePosition)) {
+                    return 2; // About Us
+                } else if (quitText.getGlobalBounds().contains(mousePosition)) {
+                    return 3; // Quit Game
+                }
+            } else if (event.type == Event::KeyPressed) {
+                if (event.key.code == Keyboard::Escape) {
+                    return 4; // Return to main menu
+                }
+            }
+        }
+
+        return 0; // No selection made
+    }
+};
+
+
+int main() {
+    
+    RenderWindow window(VideoMode::getFullscreenModes()[0], "Brick Breaker Game", Style::Fullscreen);
+
+    Texture backgroundTexture;
+    if (!backgroundTexture.loadFromFile("Assets/lava.png")) {
+        // throw runtime_error("Unable to load background image");
+    }
+    Sprite backgroundSprite(backgroundTexture);
+
+    Texture paddleTexture;
+    if (!paddleTexture.loadFromFile("Assets/paddle_gray.png")) {
+        // throw runtime_error("Unable to load paddle texture");
+    }
+
+    Paddle paddle(paddleTexture);
+    paddle.setPosition(350, window.getSize().y - 60);
+
+    Ball ball(15);
+    ball.setPosition(400, window.getSize().y - 100);
+    float ballSpeedX = 2.5f;
+    float ballSpeedY = -2.5f;
+
+    // Load brick texture
+    Texture brickTexture;
+    if (!brickTexture.loadFromFile("Assets/brick_golden.png")) {
+        // throw runtime_error("Unable to load brick texture");
+    }
+
+    const int numBricksX = 12;
+    const int numBricksY = 5;
+    vector<Brick> bricks;
+
+    // Adjust the size of bricks
+    double brickWidth = 0.2;
+    double brickHeight = 0.1;
+
+    for (int i = 0; i < numBricksX; ++i) {
+        for (int j = 0; j < numBricksY; ++j) {
+            Brick brick(brickTexture);
+            brick.setPosition(i * (brickWidth + 160) + 10, j * (brickHeight + 80) + 20);
+
+            bricks.push_back(brick);
+        }
+    }
+
+    // Adjust the size of the paddle
+    float paddleWidth = 0.0002;
+    float paddleHeight = 0.00001;
+
+    RectangleShape redLine(Vector2f(window.getSize().x, 50));
+    redLine.setFillColor(Color::Red);
+    redLine.setPosition(0, window.getSize().y - 10);
+
+    bool gameover = false;
+    int score = 0;
+
+    Font font;
+    if (!font.loadFromFile("Assets/ALIEN5.ttf")) {
+        // throw runtime_error("Unable to load font");
+    }
+
+    Text scoreText;
+    scoreText.setFont(font);
+    scoreText.setCharacterSize(80);
+    scoreText.setFillColor(Color::White);
+    scoreText.setString("Score: 0");
+    scoreText.setPosition(10, 10);
+
+    Text gameOverText;
+    gameOverText.setFont(font);
+    gameOverText.setCharacterSize(80);
+    gameOverText.setFillColor(Color::White);
+    gameOverText.setString("Game Over");
+    FloatRect gameOverBounds = gameOverText.getLocalBounds();
+    gameOverText.setOrigin(gameOverBounds.left + gameOverBounds.width / 2, gameOverBounds.top + gameOverBounds.height / 2);
+    gameOverText.setPosition(window.getSize().x / 2, window.getSize().y / 2);
+
+    Menu menu(font);
+
+    int menuChoice = 0; // 0: No selection, 1: Start Game, 2: About Us, 3: Quit Game
+
+    RectangleShape loadingBar(Vector2f{0,20});
+    loadingBar.setFillColor(Color::Red);
+    loadingBar.setPosition(Vector2f{0,550});
+    int aaa = 0;
 
     while(window.isOpen())
     {
-        float deltaTime = clock.restart().asSeconds();
-        Event ev;
-        while(window.pollEvent(ev))
-        {
-            if(ev.type==ev.Closed) window.close();
-        }
-        if(Keyboard::isKeyPressed(Keyboard::Escape)) {window.close();}
-
-        // Bounds
-            // Paddle
-        if(paddle.getPosition().x<=0) {paddle.setPosition(0.0f,paddle.getPosition().y);}
-        if(paddle.getPosition().x>=1080) {paddle.setPosition(1080,paddle.getPosition().y);}
-
-            // Ball
-        if(newBall.ball.getPosition().x<=0) {direction = -direction;}
-        if(newBall.ball.getPosition().x>=1260) {direction = -direction;}
-        if(newBall.ball.getPosition().y<=0) {direction = -direction;}
-        
-        newBall.ball.move(0,200.0f*direction*deltaTime);
-        if(newBall.ball.getPosition().y>=660.0f)
-        {
-            if(newBall.ball.getPosition().x>=paddle.getPosition().x \
-                && newBall.ball.getPosition().x+10<=paddle.getPosition().x+200.0f)
-                {
-                    direction = -direction;
+        Event event;
+        while (window.pollEvent(event)) {
+                if (event.type == Event::Closed) {
+                    window.close();
                 }
-            else {window.close();}
-        }
-
-        // Movement
-        if(Keyboard::isKeyPressed(Keyboard::A)) paddle.move(Vector2f{-500.0f*deltaTime,0.0f});
-        if(Keyboard::isKeyPressed(Keyboard::D)) paddle.move(Vector2f{500.0f*deltaTime,0.0f});
+            }
+        if(aaa>1920) break;
+        loadingBar.setSize(Vector2f{aaa,200});
+        aaa++;
         window.clear();
-        window.draw(newBall.ball);
-        window.draw(paddle);
+        window.draw(loadingBar);
         window.display();
     }
 
-    RectangleShape loading(Vector2f{0.0f,50.0f});
-    loading.setFillColor(Color::Cyan);
-    loading.setPosition(0.0f,335.0f);
-    int i=0;
-    // Outro
-    while(window.isOpen())
-    {
-        Event ev;
-        while(window.pollEvent(ev))
-        {
-            if(ev.type==ev.Closed) window.close();
-        }
-        if(Keyboard::isKeyPressed(Keyboard::Escape)) {window.close();}
-        
-        loading.setSize(Vector2f{i++,335.0f});
+    while (window.isOpen() && menuChoice == 0) {
+        menu.draw(window);
+        window.display();
+        menuChoice = menu.handleInput(window);
     }
+
+    if (menuChoice == 1) {
+        // Start Game
+        while (window.isOpen() && !gameover) {
+            Event event;
+            while (window.pollEvent(event)) {
+                if (event.type == Event::Closed) {
+                    window.close();
+                }
+            }
+
+            if (Keyboard::isKeyPressed(Keyboard::Left) && paddle.sprite.getPosition().x > 0) {
+                paddle.move(-5, 0);
+            }
+            if (Keyboard::isKeyPressed(Keyboard::Right) &&
+                paddle.sprite.getPosition().x + paddle.sprite.getGlobalBounds().width < window.getSize().x) {
+                paddle.move(5, 0);
+            }
+
+            if (Keyboard::isKeyPressed(Keyboard::A) && paddle.sprite.getPosition().x > 0) {
+                paddle.move(-5, 0);
+            }
+            if (Keyboard::isKeyPressed(Keyboard::D) &&
+                paddle.sprite.getPosition().x + paddle.sprite.getGlobalBounds().width < window.getSize().x) {
+                paddle.move(5, 0);
+            }
+
+            if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+                // Return to main menu
+                gameover = true;
+                return 0;
+                menuChoice = 0;
+            }
+
+            ball.move(ballSpeedX, ballSpeedY);
+
+            if (ball.shape.getPosition().x < 0 || ball.shape.getPosition().x + ball.shape.getRadius() * 0.1 > window.getSize().x) {
+                ballSpeedX = -ballSpeedX;
+            }
+            if (ball.shape.getPosition().y < 0) {
+                ballSpeedY = -ballSpeedY;
+            }
+
+            if (ball.shape.getGlobalBounds().intersects(paddle.sprite.getGlobalBounds())) {
+                ballSpeedY = -ballSpeedY;
+            }
+
+            for (auto& brick : bricks) {
+                if (ball.shape.getGlobalBounds().intersects(brick.sprite.getGlobalBounds())) {
+                    brick.setPosition(-100, -100);
+                    ballSpeedY = -ballSpeedY;
+
+                    // Increase score when the ball hits a brick
+                    score++;
+                    // Update the score text
+                    scoreText.setString("Score: " + to_string(score));
+                }
+            }
+
+            // Check if all bricks are destroyed
+            bool allBricksDestroyed = true;
+            for (const auto& brick : bricks) {
+                if (brick.sprite.getPosition().x != -100 || brick.sprite.getPosition().y != -100) {
+                    allBricksDestroyed = false;
+                    break;
+                }
+            }
+
+            if (allBricksDestroyed) {
+                // All bricks are destroyed, level cleared
+                gameover = true;
+                // backgroundMusic.stop();
+                // Additional actions for level cleared, if needed
+            }
+
+            if (ball.shape.getPosition().y + ball.shape.getRadius() * 2 > redLine.getPosition().y) {
+                gameover = true;
+                // backgroundMusic.stop();
+                // gameOverSound.play();
+
+                // Display the final score in the center with blinking effect
+                scoreText.setPosition(window.getSize().x / 2 - 100, window.getSize().y / 2 - 40);
+                // drawBlinkingText(window, scoreText, 5);
+            }
+
+            window.clear();
+            window.draw(backgroundSprite);
+            window.draw(paddle.sprite);
+            window.draw(ball.shape);
+            for (const auto& brick : bricks) {
+                window.draw(brick.sprite);
+            }
+            window.draw(redLine);
+
+            // Draw the score during the game, only if the game is not over
+            if (!gameover) {
+                window.draw(scoreText);
+            }
+
+            // Draw "Game Over" text only when the game is over
+            if (gameover) {
+                window.draw(gameOverText);
+            }
+
+            window.display();
+        }
+    } else if (menuChoice == 2) {
+        // About Us
+        Text aboutUs;
+        aboutUs.setFont(font);
+        aboutUs.setCharacterSize(50);
+        aboutUs.setFillColor(Color::White);
+        aboutUs.setString("Authors:\nCmidul\nBruhKib\nXopnil\nBruhHat");
+        aboutUs.setPosition(860, 300);
+
+        while (window.isOpen()) {
+            Event event;
+            while (window.pollEvent(event)) {
+                if (event.type == Event::Closed) {
+                    window.close();
+                }
+                else if (event.type == Event::KeyPressed && event.key.code == Keyboard::Escape) {
+                    // Return to the main menu when BackSpace is pressed
+                    return 0;
+                }
+            }
+
+            window.clear();
+            window.draw(backgroundSprite);
+            window.draw(aboutUs);
+
+            // Draw "Back" text
+            Text backText;
+            backText.setFont(font);
+            backText.setCharacterSize(30);
+            backText.setFillColor(Color::White);
+            backText.setString("Back (Press ESC)");
+            backText.setPosition(1620, 20);
+            window.draw(backText);
+
+            window.display();
+        }
+        } else if (menuChoice == 3) {
+            // Quit Game
+            window.close();
+        }
+    // } catch (const exception& e) {
+    //     cerr << "Error: " << e.what() << endl;
+    //     return -1;
+    // }
+
+    return 0;
 }
