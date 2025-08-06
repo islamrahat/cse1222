@@ -1,57 +1,12 @@
 #include<SFML/Graphics.hpp>
 #include<SFML/Audio.hpp>
-#include<iostream>
+#include<bits/stdc++.h>
+#include"Include/Ball.h"
+#include"Include/Paddle.h"
+#include"Include/Brick.h"
 #include<thread>
 using namespace sf;
 using namespace std;
-
-class Paddle {
-public:
-    Sprite sprite;
-
-    Paddle(Texture& texture) {
-        sprite.setTexture(texture);
-    }
-
-    void setPosition(float x, float y) {
-        sprite.setPosition(x, y);
-    }
-
-    void move(float offsetX, float offsetY) {
-        sprite.move((0.5*offsetX), (0.5*offsetY));
-    }
-};
-
-class Ball {
-public:
-    CircleShape shape;
-
-    Ball(float radius) {
-        shape.setRadius(radius);
-        shape.setFillColor(Color::Red);
-    }
-
-    void setPosition(float x, float y) {
-        shape.setPosition(x, y);
-    }
-
-    void move(float offsetX, float offsetY) {
-        shape.move((0.5*offsetX), (0.5*offsetY));
-    }
-};
-
-class Brick {
-public:
-    Sprite sprite;
-
-    Brick(Texture& texture) {
-        sprite.setTexture(texture);
-    }
-
-    void setPosition(float x, float y) {
-        sprite.setPosition(x, y);
-    }
-};
 
 class Menu {
 public:
@@ -88,6 +43,12 @@ public:
 
     int handleInput(RenderWindow& window)
     {
+        
+        SoundBuffer clickBuffer;
+        if(!clickBuffer.loadFromFile("Assets/click.wav")){}
+        Sound clickSound;
+        clickSound.setBuffer(clickBuffer);
+
         Event event;
         while (window.pollEvent(event))
         {
@@ -97,10 +58,13 @@ public:
                 Vector2f mousePosition = window.mapPixelToCoords(Mouse::getPosition(window));
 
                 if (startText.getGlobalBounds().contains(mousePosition)) {
+                    clickSound.play();
                     return 1; // Start Game
                 } else if (aboutUsText.getGlobalBounds().contains(mousePosition)) {
+                    clickSound.play();
                     return 2; // About Us
                 } else if (quitText.getGlobalBounds().contains(mousePosition)) {
+                    clickSound.play();
                     return 3; // Quit Game
                 }
             } else if (event.type == Event::KeyPressed) {
@@ -119,16 +83,13 @@ int main() {
     
     RenderWindow window(VideoMode::getFullscreenModes()[0], "Brick Breaker Game", Style::Fullscreen);
 
+
     Texture backgroundTexture;
-    if (!backgroundTexture.loadFromFile("Assets/lava.png")) {
-        // throw runtime_error("Unable to load background image");
-    }
+    if (!backgroundTexture.loadFromFile("Assets/lava.png")) {}
     Sprite backgroundSprite(backgroundTexture);
 
     Texture paddleTexture;
-    if (!paddleTexture.loadFromFile("Assets/paddle_gray.png")) {
-        // throw runtime_error("Unable to load paddle texture");
-    }
+    if (!paddleTexture.loadFromFile("Assets/paddle_gray.png")) {}
 
     Paddle paddle(paddleTexture);
     paddle.setPosition(350, window.getSize().y - 60);
@@ -140,9 +101,7 @@ int main() {
 
     // Load brick texture
     Texture brickTexture;
-    if (!brickTexture.loadFromFile("Assets/brick_golden.png")) {
-        // throw runtime_error("Unable to load brick texture");
-    }
+    if (!brickTexture.loadFromFile("Assets/brick_golden.png")) {}
 
     const int numBricksX = 12;
     const int numBricksY = 5;
@@ -173,9 +132,7 @@ int main() {
     int score = 0;
 
     Font font;
-    if (!font.loadFromFile("Assets/ALIEN5.ttf")) {
-        // throw runtime_error("Unable to load font");
-    }
+    if (!font.loadFromFile("Assets/ALIEN5.ttf")) {}
 
     Text scoreText;
     scoreText.setFont(font);
@@ -200,7 +157,7 @@ int main() {
     RectangleShape loadingBar(Vector2f{0,20});
     loadingBar.setFillColor(Color::Red);
     loadingBar.setPosition(Vector2f{0,550});
-    int aaa = 0;
+    float loadingTime = 0;
 
     while(window.isOpen())
     {
@@ -210,9 +167,9 @@ int main() {
                     window.close();
                 }
             }
-        if(aaa>1920) break;
-        loadingBar.setSize(Vector2f{aaa,200});
-        aaa++;
+        if(loadingTime>1920) break;
+        loadingBar.setSize(Vector2f{loadingTime,200});
+        loadingTime++;
         window.clear();
         window.draw(loadingBar);
         window.display();
