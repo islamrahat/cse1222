@@ -8,11 +8,13 @@ class Brick {
 public:
     Sprite sprite;
 
-    Brick(Texture& texture) {
+    Brick(Texture &texture) 
+    {
         sprite.setTexture(texture);
     }
 
-    void setPosition(float x, float y) {
+    void setPosition(float x, float y) 
+    {
         sprite.setPosition(x, y);
     }
 };
