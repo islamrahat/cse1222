@@ -23,3 +23,7 @@ public:
         sprite.move((0.5*offsetX), (0.5*offsetY));
     }
 };
+
+
+float paddleWidth = 0.0002;
+float paddleHeight = 0.00001;

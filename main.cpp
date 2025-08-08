@@ -1,6 +1,7 @@
 #include<SFML/Graphics.hpp>
 #include<SFML/Audio.hpp>
 #include<bits/stdc++.h>
+#include"Include/Menu.h"
 #include"Include/Ball.h"
 #include"Include/Paddle.h"
 #include"Include/Brick.h"
@@ -8,80 +9,10 @@
 using namespace sf;
 using namespace std;
 
-class Menu {
-public:
-    Text startText;
-    Text aboutUsText;
-    Text quitText;
-
-    Menu(Font& font) {
-        startText.setFont(font);
-        startText.setCharacterSize(40);
-        startText.setFillColor(Color::White);
-        startText.setString("Start Game");
-        startText.setPosition(860, 300);
-
-        aboutUsText.setFont(font);
-        aboutUsText.setCharacterSize(40);
-        aboutUsText.setFillColor(Color::White);
-        aboutUsText.setString("About Us");
-        aboutUsText.setPosition(860, 400);
-
-        quitText.setFont(font);
-        quitText.setCharacterSize(40);
-        quitText.setFillColor(Color::White);
-        quitText.setString("Quit Game");
-        quitText.setPosition(860, 500);
-    }
-
-    void draw(RenderWindow& window)
-{
-        window.draw(startText);
-        window.draw(aboutUsText);
-        window.draw(quitText);
-    }
-
-    int handleInput(RenderWindow& window)
-    {
-        
-        SoundBuffer clickBuffer;
-        if(!clickBuffer.loadFromFile("Assets/click.wav")){}
-        Sound clickSound;
-        clickSound.setBuffer(clickBuffer);
-
-        Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == Event::Closed) {
-                window.close();
-            } else if (event.type == Event::MouseButtonPressed) {
-                Vector2f mousePosition = window.mapPixelToCoords(Mouse::getPosition(window));
-
-                if (startText.getGlobalBounds().contains(mousePosition)) {
-                    clickSound.play();
-                    return 1; // Start Game
-                } else if (aboutUsText.getGlobalBounds().contains(mousePosition)) {
-                    clickSound.play();
-                    return 2; // About Us
-                } else if (quitText.getGlobalBounds().contains(mousePosition)) {
-                    clickSound.play();
-                    return 3; // Quit Game
-                }
-            } else if (event.type == Event::KeyPressed) {
-                if (event.key.code == Keyboard::Escape) {
-                    return 4; // Return to main menu
-                }
-            }
-        }
-
-        return 0; // No selection made
-    }
-};
-
 
 int main() {
     
-    RenderWindow window(VideoMode::getFullscreenModes()[0], "Brick Breaker Game", Style::Fullscreen);
+    RenderWindow window(VideoMode::getFullscreenModes()[0], "Wiggado Break", Style::Fullscreen);
 
 
     Texture backgroundTexture;
@@ -99,17 +30,9 @@ int main() {
     float ballSpeedX = 2.5f;
     float ballSpeedY = -2.5f;
 
-    // Load brick texture
     Texture brickTexture;
     if (!brickTexture.loadFromFile("Assets/brick_golden.png")) {}
 
-    const int numBricksX = 12;
-    const int numBricksY = 5;
-    vector<Brick> bricks;
-
-    // Adjust the size of bricks
-    double brickWidth = 0.2;
-    double brickHeight = 0.1;
 
     for (int i = 0; i < numBricksX; ++i) {
         for (int j = 0; j < numBricksY; ++j) {
@@ -120,9 +43,6 @@ int main() {
         }
     }
 
-    // Adjust the size of the paddle
-    float paddleWidth = 0.0002;
-    float paddleHeight = 0.00001;
 
     RectangleShape redLine(Vector2f(window.getSize().x, 50));
     redLine.setFillColor(Color::Red);
@@ -249,20 +169,12 @@ int main() {
             }
 
             if (allBricksDestroyed) {
-                // All bricks are destroyed, level cleared
                 gameover = true;
-                // backgroundMusic.stop();
-                // Additional actions for level cleared, if needed
             }
 
             if (ball.shape.getPosition().y + ball.shape.getRadius() * 2 > redLine.getPosition().y) {
                 gameover = true;
-                // backgroundMusic.stop();
-                // gameOverSound.play();
-
-                // Display the final score in the center with blinking effect
                 scoreText.setPosition(window.getSize().x / 2 - 100, window.getSize().y / 2 - 40);
-                // drawBlinkingText(window, scoreText, 5);
             }
 
             window.clear();
@@ -274,12 +186,10 @@ int main() {
             }
             window.draw(redLine);
 
-            // Draw the score during the game, only if the game is not over
             if (!gameover) {
                 window.draw(scoreText);
             }
 
-            // Draw "Game Over" text only when the game is over
             if (gameover) {
                 window.draw(gameOverText);
             }
@@ -302,7 +212,6 @@ int main() {
                     window.close();
                 }
                 else if (event.type == Event::KeyPressed && event.key.code == Keyboard::Escape) {
-                    // Return to the main menu when BackSpace is pressed
                     return 0;
                 }
             }
@@ -326,10 +235,6 @@ int main() {
             // Quit Game
             window.close();
         }
-    // } catch (const exception& e) {
-    //     cerr << "Error: " << e.what() << endl;
-    //     return -1;
-    // }
 
     return 0;
 }

@@ -18,3 +18,10 @@ public:
         sprite.setPosition(x, y);
     }
 };
+
+const int numBricksX = 12;
+const int numBricksY = 5;
+vector<Brick> bricks;
+
+double brickWidth = 0.2;
+double brickHeight = 0.1;
