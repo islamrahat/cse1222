@@ -24,6 +24,13 @@ int main() {
     gameOverSound.setVolume(80);
     bool soundFlag=true;
 
+    SoundBuffer loadSoundBuff;
+    if(!loadSoundBuff.loadFromFile("Assets/load.wav")) {}
+    Sound loadSound;
+    loadSound.setBuffer(loadSoundBuff);
+    loadSound.setVolume(80);
+    bool loadSoundFlag=true;
+
     Texture backgroundTexture;
     if(!backgroundTexture.loadFromFile("Assets/notunLava.png")) {}
     Sprite backgroundSprite(backgroundTexture);
@@ -32,10 +39,10 @@ int main() {
     if(!paddleTexture.loadFromFile("Assets/paddle_gray.png")) {}
 
     Paddle paddle(paddleTexture);
-    paddle.setPosition(350, window.getSize().y - 60);
+    paddle.setPosition(350, window.getSize().y-60);
 
     Ball ball(15);
-    ball.setPosition(400, window.getSize().y - 100);
+    ball.setPosition(400, window.getSize().y-100);
     float ballSpeedX=2.5f;
     float ballSpeedY=-2.5f;
 
@@ -43,8 +50,8 @@ int main() {
     if(!brickTexture.loadFromFile("Assets/brick_golden.png")) {}
 
 
-    for (int i=0; i<numBricksX; ++i) {
-        for (int j=0; j<numBricksY; ++j) {
+    for(int i=0; i<numBricksX; i++) {
+        for(int j=0; j<numBricksY; j++) {
             Brick brick(brickTexture);
             brick.setPosition(i*(brickWidth+160)+10, j*(brickHeight+80)+20);
 
@@ -55,7 +62,7 @@ int main() {
 
     RectangleShape redLine(Vector2f(window.getSize().x, 50));
     redLine.setFillColor(Color::Red);
-    redLine.setPosition(0, window.getSize().y - 10);
+    redLine.setPosition(0, window.getSize().y-10);
 
     bool gameover=false;
     int score=0;
@@ -80,8 +87,8 @@ int main() {
     gameOverText.setFillColor(Color::Yellow);
     gameOverText.setString("GAME OVER");
     FloatRect gameOverBounds=gameOverText.getLocalBounds();
-    gameOverText.setOrigin(gameOverBounds.left+gameOverBounds.width / 2, gameOverBounds.top+gameOverBounds.height / 2);
-    gameOverText.setPosition(window.getSize().x / 2, window.getSize().y / 2);
+    gameOverText.setOrigin(gameOverBounds.left+gameOverBounds.width/2, gameOverBounds.top+gameOverBounds.height/2);
+    gameOverText.setPosition(window.getSize().x/2, window.getSize().y/2);
 
     Menu menu(font);
 
@@ -137,7 +144,7 @@ int main() {
                 window.draw(backgroundSprite);
                 window.draw(paddle.sprite);
                 window.draw(ball.shape);
-                for (const auto& brick : bricks) {window.draw(brick.sprite);}
+                for(const auto& brick : bricks) {window.draw(brick.sprite);}
                 window.draw(redLine);
                 window.draw(gameStartLoad);
                 window.display();
@@ -179,7 +186,7 @@ int main() {
                 ballSpeedY=-ballSpeedY;
             }
 
-            for (auto& brick : bricks) {
+            for(auto& brick : bricks) {
                 if(ball.shape.getGlobalBounds().intersects(brick.sprite.getGlobalBounds())) {
                     brick.setPosition(-100, -100);
                     ballSpeedY=-ballSpeedY;
@@ -190,7 +197,7 @@ int main() {
 
             // Check if all bricks are destroyed
             bool allBricksDestroyed=true;
-            for (const auto& brick : bricks) {
+            for(const auto& brick : bricks) {
                 if(brick.sprite.getPosition().x != -100 || brick.sprite.getPosition().y != -100) {
                     allBricksDestroyed=false;
                     break;
@@ -209,7 +216,7 @@ int main() {
             window.draw(backgroundSprite);
             window.draw(paddle.sprite);
             window.draw(ball.shape);
-            for (const auto& brick : bricks) {
+            for(const auto& brick : bricks) {
                 window.draw(brick.sprite);
             }
             window.draw(redLine);
