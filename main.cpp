@@ -5,7 +5,6 @@
 #include"Include/Ball.h"
 #include"Include/Paddle.h"
 #include"Include/Brick.h"
-#include<thread>
 using namespace sf;
 using namespace std;
 
@@ -174,9 +173,7 @@ int main() {
                 if (ball.shape.getGlobalBounds().intersects(brick.sprite.getGlobalBounds())) {
                     brick.setPosition(-100, -100);
                     ballSpeedY=-ballSpeedY;
-
                     score++;
-                    // Update the score text
                     scoreText.setString("Score: "+to_string(score));
                 }
             }
@@ -196,7 +193,6 @@ int main() {
 
             if (ball.shape.getPosition().y+ball.shape.getRadius()*2>redLine.getPosition().y) {
                 gameover=true;
-                scoreText.setPosition(window.getSize().x / 2 - 100, window.getSize().y / 2 - 40);
             }
 
             window.clear();
