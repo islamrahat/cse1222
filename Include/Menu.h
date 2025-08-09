@@ -31,7 +31,7 @@ public:
     }
 
     void draw(RenderWindow& window)
-{
+    {
         window.draw(startText);
         window.draw(aboutUsText);
         window.draw(quitText);

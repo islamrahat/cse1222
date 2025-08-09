@@ -53,19 +53,23 @@ int main() {
 
     Font font;
     if (!font.loadFromFile("Assets/ALIEN5.ttf")) {}
+    Font PixelFont;
+    if (!PixelFont.loadFromFile("Assets/PIXEL.otf")) {}
+    Font GameOverFont;
+    if (!GameOverFont.loadFromFile("Assets/GameOver.ttf"));
 
     Text scoreText;
-    scoreText.setFont(font);
-    scoreText.setCharacterSize(80);
+    scoreText.setFont(PixelFont);
+    scoreText.setCharacterSize(70);
     scoreText.setFillColor(Color::White);
     scoreText.setString("Score: 0");
     scoreText.setPosition(10, 10);
 
     Text gameOverText;
-    gameOverText.setFont(font);
+    gameOverText.setFont(GameOverFont);
     gameOverText.setCharacterSize(80);
-    gameOverText.setFillColor(Color::White);
-    gameOverText.setString("Game Over");
+    gameOverText.setFillColor(Color::Yellow);
+    gameOverText.setString("GAME OVER");
     FloatRect gameOverBounds=gameOverText.getLocalBounds();
     gameOverText.setOrigin(gameOverBounds.left+gameOverBounds.width / 2, gameOverBounds.top+gameOverBounds.height / 2);
     gameOverText.setPosition(window.getSize().x / 2, window.getSize().y / 2);
@@ -128,9 +132,7 @@ int main() {
             }
 
             if (Keyboard::isKeyPressed(Keyboard::Escape)) {
-                // Return to main menu
                 gameover=true;
-                return 0;
                 menuChoice=0;
             }
 
@@ -190,7 +192,20 @@ int main() {
             }
 
             if (gameover) {
-                window.draw(gameOverText);
+                while (window.isOpen()) {
+            Event event;
+            while (window.pollEvent(event)) {
+                if (event.type==Event::Closed) {
+                    window.close();
+                }
+                else if (event.type==Event::KeyPressed && event.key.code==Keyboard::Escape) {
+                    return 0;
+                }
+            }
+            window.draw(gameOverText);
+            window.display();
+            window.clear();
+            }
             }
 
             window.display();
