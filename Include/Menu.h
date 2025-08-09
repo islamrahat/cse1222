@@ -48,9 +48,9 @@ public:
         Event event;
         while (window.pollEvent(event))
         {
-            if (event.type == Event::Closed) {
+            if (event.type==Event::Closed) {
                 window.close();
-            } else if (event.type == Event::MouseButtonPressed) {
+            } else if (event.type==Event::MouseButtonPressed) {
                 Vector2f mousePosition = window.mapPixelToCoords(Mouse::getPosition(window));
 
                 if (startText.getGlobalBounds().contains(mousePosition)) {
@@ -70,6 +70,6 @@ public:
             }
         }
 
-        return 0; // No selection made
+        return 0; 
     }
 };
