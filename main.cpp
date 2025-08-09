@@ -13,13 +13,23 @@ int main() {
     
     RenderWindow window(VideoMode::getFullscreenModes()[0], "Wiggado Break", Style::Fullscreen);
 
+    SoundBuffer ballSoundBuff;
+    if(!ballSoundBuff.loadFromFile("Assets/ball_collision.wav")) {}
+    Sound ballSound;
+
+    SoundBuffer gameOverBuff;
+    if(!gameOverBuff.loadFromFile("Assets/gameOverSound.wav")) {}
+    Sound gameOverSound;
+    gameOverSound.setBuffer(gameOverBuff);
+    gameOverSound.setVolume(80);
+    bool soundFlag=true;
 
     Texture backgroundTexture;
-    if (!backgroundTexture.loadFromFile("Assets/notunLava.png")) {}
+    if(!backgroundTexture.loadFromFile("Assets/notunLava.png")) {}
     Sprite backgroundSprite(backgroundTexture);
 
     Texture paddleTexture;
-    if (!paddleTexture.loadFromFile("Assets/paddle_gray.png")) {}
+    if(!paddleTexture.loadFromFile("Assets/paddle_gray.png")) {}
 
     Paddle paddle(paddleTexture);
     paddle.setPosition(350, window.getSize().y - 60);
@@ -30,7 +40,7 @@ int main() {
     float ballSpeedY=-2.5f;
 
     Texture brickTexture;
-    if (!brickTexture.loadFromFile("Assets/brick_golden.png")) {}
+    if(!brickTexture.loadFromFile("Assets/brick_golden.png")) {}
 
 
     for (int i=0; i<numBricksX; ++i) {
@@ -51,11 +61,11 @@ int main() {
     int score=0;
 
     Font font;
-    if (!font.loadFromFile("Assets/ALIEN5.ttf")) {}
+    if(!font.loadFromFile("Assets/ALIEN5.ttf")) {}
     Font PixelFont;
-    if (!PixelFont.loadFromFile("Assets/PIXEL.otf")) {}
+    if(!PixelFont.loadFromFile("Assets/PIXEL.otf")) {}
     Font GameOverFont;
-    if (!GameOverFont.loadFromFile("Assets/GameOver.ttf"));
+    if(!GameOverFont.loadFromFile("Assets/GameOver.ttf"));
 
     Text scoreText;
     scoreText.setFont(PixelFont);
@@ -86,7 +96,7 @@ int main() {
     {
         Event event;
         while (window.pollEvent(event)) {
-                if (event.type==Event::Closed) {
+                if(event.type==Event::Closed) {
                     window.close();
                 }
             }
@@ -111,12 +121,12 @@ int main() {
     gameStartLoad.setSize(Vector2f{1920,200});
     gameStartLoad.setPosition(Vector2f{1920,550});
 
-    if (menuChoice==1) {
+    if(menuChoice==1) {
         // Start Game
         while (window.isOpen() && !gameover) {
             Event event;
             while (window.pollEvent(event)) {
-                if (event.type==Event::Closed) {
+                if(event.type==Event::Closed) {
                     window.close();
                 }
             }
@@ -135,42 +145,42 @@ int main() {
                 gameStartLoad.move(Vector2f{-2,0});
             }
 
-            if (Keyboard::isKeyPressed(Keyboard::Left) && paddle.sprite.getPosition().x>0) {
+            if(Keyboard::isKeyPressed(Keyboard::Left) && paddle.sprite.getPosition().x>0) {
                 paddle.move(-5, 0);
             }
-            if (Keyboard::isKeyPressed(Keyboard::Right) &&
+            if(Keyboard::isKeyPressed(Keyboard::Right) &&
                 paddle.sprite.getPosition().x+paddle.sprite.getGlobalBounds().width<window.getSize().x) {
                 paddle.move(5, 0);
             }
 
-            if (Keyboard::isKeyPressed(Keyboard::A) && paddle.sprite.getPosition().x>0) {
+            if(Keyboard::isKeyPressed(Keyboard::A) && paddle.sprite.getPosition().x>0) {
                 paddle.move(-5, 0);
             }
-            if (Keyboard::isKeyPressed(Keyboard::D) &&
+            if(Keyboard::isKeyPressed(Keyboard::D) &&
                 paddle.sprite.getPosition().x+paddle.sprite.getGlobalBounds().width<window.getSize().x) {
                 paddle.move(5, 0);
             }
 
-            if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+            if(Keyboard::isKeyPressed(Keyboard::Escape)) {
                 gameover=true;
                 menuChoice=0;
             }
 
             ball.move(ballSpeedX, ballSpeedY);
 
-            if (ball.shape.getPosition().x<0 || ball.shape.getPosition().x+ball.shape.getRadius()*0.1>window.getSize().x) {
+            if(ball.shape.getPosition().x<0 || ball.shape.getPosition().x+ball.shape.getRadius()*0.1>window.getSize().x) {
                 ballSpeedX=-ballSpeedX;
             }
-            if (ball.shape.getPosition().y<0) {
+            if(ball.shape.getPosition().y<0) {
                 ballSpeedY=-ballSpeedY;
             }
 
-            if (ball.shape.getGlobalBounds().intersects(paddle.sprite.getGlobalBounds())) {
+            if(ball.shape.getGlobalBounds().intersects(paddle.sprite.getGlobalBounds())) {
                 ballSpeedY=-ballSpeedY;
             }
 
             for (auto& brick : bricks) {
-                if (ball.shape.getGlobalBounds().intersects(brick.sprite.getGlobalBounds())) {
+                if(ball.shape.getGlobalBounds().intersects(brick.sprite.getGlobalBounds())) {
                     brick.setPosition(-100, -100);
                     ballSpeedY=-ballSpeedY;
                     score++;
@@ -181,17 +191,17 @@ int main() {
             // Check if all bricks are destroyed
             bool allBricksDestroyed=true;
             for (const auto& brick : bricks) {
-                if (brick.sprite.getPosition().x != -100 || brick.sprite.getPosition().y != -100) {
+                if(brick.sprite.getPosition().x != -100 || brick.sprite.getPosition().y != -100) {
                     allBricksDestroyed=false;
                     break;
                 }
             }
 
-            if (allBricksDestroyed) {
+            if(allBricksDestroyed) {
                 gameover=true;
             }
 
-            if (ball.shape.getPosition().y+ball.shape.getRadius()*2>redLine.getPosition().y) {
+            if(ball.shape.getPosition().y+ball.shape.getRadius()*2>redLine.getPosition().y) {
                 gameover=true;
             }
 
@@ -204,30 +214,31 @@ int main() {
             }
             window.draw(redLine);
 
-            if (!gameover) {
+            if(!gameover) {
                 window.draw(scoreText);
             }
 
-            if (gameover) {
+            if(gameover) {
                 while (window.isOpen()) {
-            Event event;
-            while (window.pollEvent(event)) {
-                if (event.type==Event::Closed) {
-                    window.close();
+                    Event event;
+                    while (window.pollEvent(event)) {
+                        if(event.type==Event::Closed) {
+                            window.close();
+                        }
+                        else if(event.type==Event::KeyPressed && event.key.code==Keyboard::Escape) {
+                            return 0;
+                        }
+                    }
+                    window.draw(gameOverText);
+                    if(soundFlag) {gameOverSound.play(); soundFlag=false;}
+                    window.display();
+                    window.clear();
                 }
-                else if (event.type==Event::KeyPressed && event.key.code==Keyboard::Escape) {
-                    return 0;
-                }
-            }
-            window.draw(gameOverText);
-            window.display();
-            window.clear();
-            }
             }
 
             window.display();
         }
-    } else if (menuChoice==2) {
+    } else if(menuChoice==2) {
         // About Us
         Text aboutUs;
         aboutUs.setFont(font);
@@ -239,10 +250,10 @@ int main() {
         while (window.isOpen()) {
             Event event;
             while (window.pollEvent(event)) {
-                if (event.type==Event::Closed) {
+                if(event.type==Event::Closed) {
                     window.close();
                 }
-                else if (event.type==Event::KeyPressed && event.key.code==Keyboard::Escape) {
+                else if(event.type==Event::KeyPressed && event.key.code==Keyboard::Escape) {
                     return 0;
                 }
             }
@@ -262,7 +273,7 @@ int main() {
 
             window.display();
         }
-        } else if (menuChoice==3) {
+        } else if(menuChoice==3) {
             // Quit Game
             window.close();
         }
