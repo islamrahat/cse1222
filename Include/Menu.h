@@ -39,32 +39,24 @@ public:
 
     int handleInput(RenderWindow& window)
     {
-        
-        SoundBuffer clickBuffer;
-        if(!clickBuffer.loadFromFile("Assets/click.wav")){}
-        Sound clickSound;
-        clickSound.setBuffer(clickBuffer);
 
         Event event;
         while (window.pollEvent(event))
         {
-            if (event.type==Event::Closed) {
+            if(event.type==Event::Closed) {
                 window.close();
-            } else if (event.type==Event::MouseButtonPressed) {
+            } else if(event.type==Event::MouseButtonPressed) {
                 Vector2f mousePosition = window.mapPixelToCoords(Mouse::getPosition(window));
 
-                if (startText.getGlobalBounds().contains(mousePosition)) {
-                    clickSound.play();
+                if(startText.getGlobalBounds().contains(mousePosition)) {
                     return 1; // Start Game
-                } else if (aboutUsText.getGlobalBounds().contains(mousePosition)) {
-                    clickSound.play();
+                } else if(aboutUsText.getGlobalBounds().contains(mousePosition)) {
                     return 2; // About Us
-                } else if (quitText.getGlobalBounds().contains(mousePosition)) {
-                    clickSound.play();
+                } else if(quitText.getGlobalBounds().contains(mousePosition)) {
                     return 3; // Quit Game
                 }
-            } else if (event.type == Event::KeyPressed) {
-                if (event.key.code == Keyboard::Escape) {
+            } else if(event.type == Event::KeyPressed) {
+                if(event.key.code == Keyboard::Escape) {
                     return 4; // Return to main menu
                 }
             }

@@ -72,7 +72,7 @@ int main() {
     Font PixelFont;
     if(!PixelFont.loadFromFile("Assets/PIXEL.otf")) {}
     Font GameOverFont;
-    if(!GameOverFont.loadFromFile("Assets/GameOver.ttf"));
+    if(!GameOverFont.loadFromFile("Assets/GameOver.ttf")) {}
 
     Text scoreText;
     scoreText.setFont(PixelFont);
@@ -140,6 +140,7 @@ int main() {
             
             while(gameStartTime<1920)
             {
+                if(loadSoundFlag) {loadSound.play(); loadSoundFlag=false;}
                 window.clear();
                 window.draw(backgroundSprite);
                 window.draw(paddle.sprite);
