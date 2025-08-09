@@ -16,7 +16,7 @@ int main() {
 
 
     Texture backgroundTexture;
-    if (!backgroundTexture.loadFromFile("Assets/lava.png")) {}
+    if (!backgroundTexture.loadFromFile("Assets/notunLava.png")) {}
     Sprite backgroundSprite(backgroundTexture);
 
     Texture paddleTexture;
@@ -105,6 +105,13 @@ int main() {
         menuChoice=menu.handleInput(window);
     }
 
+    bool spaceToStart=true;
+    float gameStartTime=0;
+    RectangleShape gameStartLoad(Vector2f{0,550});
+    gameStartLoad.setFillColor(Color::Red);
+    gameStartLoad.setSize(Vector2f{1920,200});
+    gameStartLoad.setPosition(Vector2f{1920,550});
+
     if (menuChoice==1) {
         // Start Game
         while (window.isOpen() && !gameover) {
@@ -113,6 +120,20 @@ int main() {
                 if (event.type==Event::Closed) {
                     window.close();
                 }
+            }
+            
+            while(gameStartTime<1920)
+            {
+                window.clear();
+                window.draw(backgroundSprite);
+                window.draw(paddle.sprite);
+                window.draw(ball.shape);
+                for (const auto& brick : bricks) {window.draw(brick.sprite);}
+                window.draw(redLine);
+                window.draw(gameStartLoad);
+                window.display();
+                gameStartTime+=2;
+                gameStartLoad.move(Vector2f{-2,0});
             }
 
             if (Keyboard::isKeyPressed(Keyboard::Left) && paddle.sprite.getPosition().x>0) {
